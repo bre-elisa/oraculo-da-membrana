@@ -141,6 +141,38 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* Novo Bloco de CSS Responsivo */
+@media(max-width:880px){
+/* 1. Adaptação do Layout de 2 Colunas (Desktop) para 1 Coluna (Mobile) */
+.stage{flex-direction:column-reverse; gap: 0;} /* Inverte a ordem para que o score/timer fique no
+topo do quiz */
+.right{width:100%; max-width:100%;} /* O lado direito (score/timer) ocupa toda a largura */
+.left{min-width:100%;} /* O lado esquerdo (pergunta/respostas) ocupa toda a largura */
+/* 2. Otimizações de Espaçamento e Fonte */
+.wrap{margin: 10px auto; padding: 10px;} /* Diminui margens do container principal */
+header{flex-direction: column; align-items: flex-start; margin-bottom: 12px;} /* Empilha elementos
+no cabeçalho */
+h1{font-size:24px; text-align: left;} /* Ajusta tamanho do título */
+.subtitle{font-size: 12px;} /* Ajusta tamanho do subtítulo */
+.pill{display: none;} /* Oculta as pílulas de ícones para economizar espaço (opcional) */
+/* 3. Ajuste do Layout da Pergunta */
+.qmeta{flex-direction: column; align-items: flex-start; gap: 6px;}
+.progress{width: 100% !important;} /* Ocupa toda a largura disponível */
+  .question{font-size:18px; margin: 10px 0;}
+  /* 4. Ajuste dos Botões de Resposta */
+.answers{grid-template-columns:1fr;} /* Faz com que as respostas ocupem 100% da largura,
+empilhando-se */
+button.ans{padding: 12px; font-size: 14px;} /* Ajusta o padding e fonte dos botões */
+.ans strong{width: 30px; font-size: 14px;}
+.ans .explain{font-size: 11px;}
+/* 5. Ajuste de Imagens/SVG */
+.img-wrap svg{height:120px; max-width: 90%;} /* Diminui o tamanho do SVG */
+  /* 6. Controles Inferiores */
+  .controls{flex-wrap: wrap; justify-content: space-around;}
+.controls > div:last-child{flex: 1 1 100%; margin-top: 10px; justify-content: space-between;} /* Move
+a label para a linha de baixo e faz ocupar toda a largura */
+.btn{font-size: 14px; padding: 8px 12px;}
+}
 
 </style>
 </head>
@@ -800,4 +832,5 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </script>
 </body>
 </html>
+
 
