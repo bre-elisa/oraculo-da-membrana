@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="pt-BR">
+<head> 
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Oráculo da Membrana — Ritual</title>
+<style>
+  :root{
+    --bg:#4d1f5c;
+    --card:#c22c6f;
+    --muted:#cfc8e6;
+    --violet:#fe6cd5;
+    --magenta:#fb5f5f;
+    --cyan:#084743;
+    --gold:#d4af37;
+    --glass: rgba(240, 76, 188, 0.03);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:#71234a;font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;color:#f4f3ff; -webkit-font-smoothing:antialiased}
+  /* mystical background: animated membrane textures using layered SVGs */
+  .bg-wrap{
+    position:fixed;inset:0;z-index:0;overflow:hidden;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(125, 38, 38, 0.05), transparent 6%),
+                radial-gradient(1000px 500px at 90% 90%, rgba(6,182,212,0.03), transparent 6%),
+                linear-gradient(180deg,#261134 0%, #4a0c24 100%);
+  }
+  /* moving membrane layers */
+  .mem-layer{
+    position:absolute;left:-20%;top:-20%;width:160%;height:140%;opacity:0.12;filter:blur(18px);transform-origin:center;
+    background-repeat:no-repeat;background-size:cover;mix-blend-mode:screen;
+    animation: floatslow 18s ease-in-out infinite;
+  }
+  .mem-layer.l2{opacity:0.09;filter:blur(26px);animation-duration:26s;transform:translateY(10px) rotate(3deg)}
+  .mem-layer.l3{opacity:0.06;filter:blur(34px);animation-duration:36s;transform:translateY(-12px) rotate(-2deg)}
+  @keyframes floatslow{
+    0%{transform:translateY(0px) scale(1) rotate(0deg)}
+    50%{transform:translateY(18px) scale(1.02) rotate(1deg)}
+    100%{transform:translateY(0px) scale(1) rotate(0deg)}
+  }
+
+  .wrap{position:relative;z-index:2;max-width:1100px;margin:28px auto;padding:18px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+  .title{display:flex;flex-direction:column;gap:6px}
+  h1{margin:0;font-size:28px;letter-spacing:2px;font-weight:700;
+      text-shadow:0 0 18px rgba(227, 15, 33, 0.12), 0 0 6px rgba(194,65,245,0.08);
+      font-family: "Garamond", "Georgia", serif; color:linear-gradient(#fff,#eee)}
+  .subtitle{color:var(--muted);font-size:13px}
+  .pill{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:6px 12px;border-radius:999px;font-size:13px;color:var(--muted);border:1px solid rgba(255,255,255,0.03)}
+  main.card{
+    background: radial-gradient(800px 300px at 20% 10%, rgba(247, 103, 244, 0.02), transparent 6%),
+                linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));
+    border-radius:16px;padding:18px;box-shadow: 0 18px 60px rgba(6,6,10,0.75);
+    border:1px solid rgba(223, 90, 176, 0.045);position:relative;overflow:hidden;
+  }
+
+  /* magical runes floating */
+  .runes{position:absolute;right:-6%;top:-12%;width:40%;height:60%;opacity:0.06;pointer-events:none;mix-blend-mode:screen}
+  .runes svg{width:100%;height:100%;animation: spinslow 36s linear infinite}
+  @keyframes spinslow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+  .stage{display:flex;gap:18px;align-items:flex-start}
+  .left{flex:1;min-width:220px}
+  .right{width:360px;max-width:38%}
+  .qmeta{display:flex;justify-content:space-between;align-items:center}
+  .question{font-size:20px;margin:12px 0 16px;line-height:1.28;font-family: "Garamond", "Georgia", serif}
+  /* mystical letters style */
+  .mystic-title{font-family: "Garamond", "Georgia", serif; font-variant: small-caps; letter-spacing:1px; font-weight:700; text-shadow:0 2px 8px rgba(139,92,246,0.12);}
+
+  .answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  button.ans{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+    border:1px solid rgba(255,255,255,0.03);
+    padding:14px;border-radius:14px;color:#fff;text-align:left;cursor:pointer;
+    transition: transform .12s, box-shadow .14s, border-color .12s, background .12s;
+    box-shadow: 0 14px 36px rgba(4,2,8,0.65);display:flex;gap:12px;align-items:center;
+    backdrop-filter: blur(4px);
+  }
+  button.ans:hover{transform:translateY(-6px);box-shadow:0 20px 46px rgba(4,2,8,0.78)}
+  .ans strong{display:inline-block;width:36px;text-align:center;font-size:15px;font-family: "Garamond", "Georgia", serif}
+  .ans .label{font-weight:700}
+  .ans .explain{font-size:12px;color:var(--muted);margin-top:6px}
+
+  .ans.correct{outline:3px solid rgba(139,92,246,0.18);box-shadow:0 18px 46px rgba(139,92,246,0.08);transform:translateY(-2px)}
+  .ans.wrong{outline:3px solid rgba(194,65,245,0.12);opacity:0.95;filter:grayscale(.03)}
+
+  .controls{display:flex;gap:12px;align-items:center;margin-top:14px}
+  .btn{
+    background:linear-gradient(90deg,var(--violet),var(--magenta));
+    border:none;padding:10px 14px;border-radius:12px;color:#fff;cursor:pointer;font-weight:700;
+    box-shadow: 0 10px 30px rgba(139,92,246,0.18);
+  }
+  .btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.04);box-shadow:none;color:var(--muted);font-weight:600;padding:9px 12px}
+  .small{font-size:13px;color:var(--muted)}
+  .progress{height:12px;background:#0b0a0e;border-radius:999px;overflow:hidden;margin-top:8px;border:1px solid rgba(255,255,255,0.02)}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan));width:0%;transition:width .35s}
+  .timer{font-weight:900;color:#ffdede;font-size:18px;letter-spacing:0.6px}
+  .score{font-weight:800;color:#cffbf6}
+
+  .magic{
+    margin-top:14px;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(139,92,246,0.06), rgba(6,182,212,0.03));
+    color:#f8f6ff;border:1px solid rgba(255,255,255,0.02);font-weight:700;min-height:72px;display:flex;align-items:center;gap:12px;
+    box-shadow:0 12px 36px rgba(6,11,20,0.6);
+  }
+  .sparkle{width:56px;height:56px;border-radius:999px;background:linear-gradient(90deg,var(--magenta),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 10px 34px rgba(194,65,245,0.16)}
+
+  .img-wrap{display:flex;align-items:center;justify-content:center;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02);margin-top:12px}
+  .img-wrap svg{max-width:100%;height:200px}
+
+  /* initial ritual screen */
+  .intro{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;background:linear-gradient(180deg, rgba(2,2,6,0.86), rgba(4,2,8,0.94));
+    backdrop-filter: blur(6px);
+  }
+  .intro-card{max-width:760px;padding:28px;border-radius:14px;text-align:center;border:1px solid rgba(255,255,255,0.03);box-shadow:0 30px 80px rgba(0,0,0,0.7);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008))}
+  .intro h2{font-family:"Garamond","Georgia",serif;font-size:36px;margin:6px 0 10px;letter-spacing:3px;text-shadow:0 0 26px rgba(139,92,246,0.14)}
+  .intro p{color:var(--muted);margin:8px 0 18px;font-size:15px}
+  .start-btn{background:linear-gradient(90deg,var(--violet),var(--magenta));border:none;color:#fff;padding:12px 18px;font-weight:800;border-radius:12px;cursor:pointer;box-shadow:0 12px 30px rgba(139,92,246,0.2)}
+  .start-sub{font-size:13px;color:var(--muted);margin-top:12px}
+
+  /* footer */
+  footer{margin-top:14px;color:var(--muted);text-align:center;font-size:13px}
+
+  /* responsive */
+  @media(max-width:880px){
+    .stage{flex-direction:column-reverse}
+    .right{width:100%}
+    .img-wrap svg{height:140px}
+    h1{font-size:22px}
+  }
+  body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(-45deg, #12002f, #3d0066, #0a0022, #5200a3);
+  background-size: 400% 400%;
+  animation: auroraFlow 20s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes auroraFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+</style>
+</head>
+<body>
+  <div class="bg-wrap" aria-hidden>
+    <!-- animated membrane layers using base64 SVG backgrounds to create texture -->
+    <div class="mem-layer l1" style="background-image:url('data:image/svg+xml;utf8,\
+      <svg xmlns=\\\"http://www.w3.org/2000/svg\\\" viewBox=\\\"0 0 800 400\\\">\
+        <defs><linearGradient id=\\\"g\\\" x1=\\\"0\\\" x2=\\\"1\\\"><stop offset=\\\"0\\\" stop-color=\\\"%238b5cf6\\\" stop-opacity=\\\"0.18\\\"/><stop offset=\\\"1\\\" stop-color=\\\"%2306b6d4\\\" stop-opacity=\\\"0.12\\\"/></linearGradient></defs>\
+        <rect width=\\\"100%\\\" height=\\\"100%\\\" fill=\\\"none\\\"/>\
+        <g fill=\\\"none\\\" stroke=\\\"url(%23g)\\\" stroke-opacity=\\\"0.26\\\" stroke-width=2>\
+          <path d=\\\"M0 60 C120 40, 220 120, 400 90 S700 40,800 60\\\"/>\
+          <path d=\\\"M0 140 C140 120, 260 200, 400 170 S680 120,800 140\\\"/>\
+          <path d=\\\"M0 220 C100 200, 260 260, 400 235 S700 200,800 220\\\"/>\
+        </g></svg>');"></div>
+    <div class="mem-layer l2" style="background-image:url('data:image/svg+xml;utf8,\
+      <svg xmlns=\\\"http://www.w3.org/2000/svg\\\" viewBox=\\\"0 0 800 400\\\">\
+        <defs><linearGradient id=\\\"g2\\\" x1=\\\"0\\\" x2=\\\"1\\\"><stop offset=\\\"0\\\" stop-color=\\\"%238b5cf6\\\" stop-opacity=\\\"0.12\\\"/><stop offset=\\\"1\\\" stop-color=\\\"%2306b6d4\\\" stop-opacity=\\\"0.10\\\"/></linearGradient></defs>\
+        <g fill=\\\"none\\\" stroke=\\\"url(%23g2)\\\" stroke-opacity=\\\"0.18\\\" stroke-width=1>\
+          <path d=\\\"M20 10 Q110 80 200 40 T380 20 T580 60 T780 20\\\"/>\
+          <path d=\\\"M0 90 Q140 160 260 120 T440 90 T660 120 T800 90\\\"/>\
+          <path d=\\\"M0 180 Q120 210 260 190 T420 180 T640 200 T800 180\\\"/>\
+        </g></svg>');"></div>
+    <div class="mem-layer l3" style="background-image:url('data:image/svg+xml;utf8,\
+      <svg xmlns=\\\"http://www.w3.org/2000/svg\\\" viewBox=\\\"0 0 1000 600\\\">\
+        <defs><linearGradient id=\\\"g3\\\" x1=\\\"0\\\" x2=\\\"1\\\"><stop offset=\\\"0\\\" stop-color=\\\"%23c241f5\\\" stop-opacity=\\\"0.06\\\"/><stop offset=\\\"1\\\" stop-color=\\\"%2306b6d4\\\" stop-opacity=\\\"0.04\\\"/></linearGradient></defs>\
+        <g fill=\\\"none\\\" stroke=\\\"url(%23g3)\\\" stroke-opacity=\\\"0.14\\\" stroke-width=1>\
+          <path d=\\\"M0 50 C110 20, 250 100, 420 80 S700 20,1000 50\\\"/>\
+          <path d=\\\"M0 200 C140 180, 300 240, 480 220 S760 180,1000 200\\\"/>\
+        </g></svg>');"></div>
+    <div class="runes" aria-hidden>
+      <!-- subtle rune SVG -->
+      <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" stroke="#bfa3ff" stroke-opacity="0.06" stroke-width="1.4">
+          <circle cx="300" cy="300" r="220"/>
+          <circle cx="300" cy="300" r="160"/>
+          <g transform="translate(300,300)">
+            <path d="M-120 0 A120 120 0 0 1 120 0" />
+            <path d="M0 -120 A120 120 0 0 1 0 120" />
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1 class="mystic-title">🔮 Oráculo da Membrana</h1>
+        <div class="subtitle">Ritual interativo — membrana, fluxos e portais celulares</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="pill">🧫👩🏻‍🔬🧪</div>
+        <div class="pill"> ⏱️ 40 s</div>
+      </div>
+    </header>
+
+    <main class="card" id="gameCard" role="main" aria-live="polite" aria-atomic="true">
+      <div class="stage">
+        <div class="left">
+          <div class="qmeta">
+            <div class="small">Pergunta <strong id="qIndex">1</strong>/<span id="qTotal">10</span></div>
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="small">Progresso</div>
+              <div class="progress" aria-hidden style="width:190px"><i id="progressBar"></i></div>
+            </div>
+          </div>
+
+          <div class="question" id="questionText">Prepare-se para o ritual...</div>
+
+          <div id="imageContainer" class="img-wrap" aria-hidden style="display:none"></div>
+
+          <div class="answers" id="answers" role="list"></div>
+
+          <div class="controls" style="margin-top:18px">
+            <button class="btn" id="nextBtn" disabled>Próxima</button>
+            <button class="btn secondary" id="skipBtn">Pular (-0,5)</button>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <label class="small">Tempo/p:
+                <input id="timePer" type="number" value="40" min="10" max="120" style="width:76px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:#fff;margin-left:8px">
+              </label>
+              <button id="muteBtn" class="btn secondary" title="Ativar/Desativar som">🔊 Som</button>
+            </div>
+          </div>
+
+          <div class="magic" id="magicBox">
+            <div class="sparkle" id="sparkIcon"></div>
+            <div id="magicText">Bem-vinda, Oraculista — respire e sintonize a membrana.</div>
+          </div>
+        </div>
+
+        <aside class="right">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">Tempo</div>
+            <div class="timer" id="timerText">--s</div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;margin-top:8px;align-items:center">
+            <div style="font-weight:800">Pontuação</div>
+            <div class="score" id="score">0.0</div>
+          </div>
+
+          <section style="margin-top:14px" class="card" aria-hidden>
+            <div style="font-weight:800;margin-bottom:8px;color:var(--muted)">Regras Rápidas</div>
+            <ul style="margin:0;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.5">
+              <li>40 s por pergunta (ajustável)</li>
+              <li>Acerto: +1 ponto</li>
+              <li>Erro: 0 ponto (explicação aparece)</li>
+              <li>Pular: −0,5 ponto</li>
+            </ul>
+          </section>
+
+          <section style="margin-top:12px" class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><strong>Placar Local</strong><div class="small">Salvo no navegador</div></div>
+              <div><button id="clearScores" class="btn secondary">Limpar</button></div>
+            </div>
+            <div class="leaderboard" id="leaderboard" style="margin-top:10px">
+              <ol class="lead" id="leadList"><li class="small">Nenhum resultado — jogue para aparecer.</li></ol>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer>Abra no celular dos alunos ou projete — peça que iniciem o Ritual ao mesmo tempo.</footer>
+  </div>
+
+  <!-- Intro ritual screen -->
+  <div class="intro" id="intro">
+    <div class="intro-card" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+      <h2 id="introTitle">🔮 Oráculo da Membrana</h2>
+      <p>Teste seu entendimento sobre a membrana plasmática. Sinta a energia e responda com atenção.</p>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:18px">
+        <button class="start-btn" id="startBtn">Iniciar</button>
+      </div>
+      <div class="start-sub">Por Brenda, Roger e Tayane</div>
+    </div>
+  </div>
+
+<script>
+/* ====== QUESTIONS (10): cada item tem svg quando aplicável ====== */
+const QUESTIONS = [
+  {
+    q: "Qual é o principal componente que forma a bicamada da membrana plasmática?",
+    choices: ["Glicídios", "Fosfolipídios", "Proteínas periféricas", "Ácidos nucleicos"],
+    correct: 1,
+    explanation: "Fosfolipídios têm cabeça hidrofílica e caudas hidrofóbicas; organizam-se em bicamada.",
+    svg: `<svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+      <rect width="100%" height="100%" fill="none"/>
+      <g transform="translate(40,30)">
+        <rect x="0" y="0" width="580" height="36" rx="12" fill="#0b0b0f"/>
+        <g fill="url(#g1)">
+          <circle cx="60" cy="18" r="12" />
+          <circle cx="150" cy="18" r="12" />
+          <circle cx="240" cy="18" r="12" />
+          <circle cx="330" cy="18" r="12" />
+          <circle cx="420" cy="18" r="12" />
+          <circle cx="510" cy="18" r="12" />
+        </g>
+        <g transform="translate(0,46)">
+          <rect x="0" y="0" width="580" height="120" rx="12" fill="#05050a"/>
+          <g fill="#3b2b5f" opacity="0.95">
+            <ellipse cx="60" cy="60" rx="10" ry="36"/>
+            <ellipse cx="150" cy="60" rx="10" ry="36"/>
+            <ellipse cx="240" cy="60" rx="10" ry="36"/>
+            <ellipse cx="330" cy="60" rx="10" ry="36"/>
+            <ellipse cx="420" cy="60" rx="10" ry="36"/>
+            <ellipse cx="510" cy="60" rx="10" ry="36"/>
+          </g>
+        </g>
+        <rect x="0" y="176" width="580" height="36" rx="12" fill="#0b0b0f"/>
+      </g>
+    </svg>`
+  },
+  {
+    q: "A porção hidrofóbica das moléculas de fosfolipídio corresponde a:",
+    choices: ["As cabeças polares", "As caudas de ácidos graxos", "Os grupos fosfato", "As proteínas integrais"],
+    correct: 1,
+    explanation: "As caudas são apolares (ácidos graxos) e orientam-se para o interior da bicamada.",
+    svg: `<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(20,20)">
+        <rect x="0" y="0" width="560" height="50" rx="12" fill="#0b0b0f"/>
+        <g fill="#b28cff">
+          <circle cx="80" cy="25" r="12"/>
+          <circle cx="180" cy="25" r="12"/>
+          <circle cx="280" cy="25" r="12"/>
+          <circle cx="380" cy="25" r="12"/>
+          <circle cx="480" cy="25" r="12"/>
+        </g>
+        <g transform="translate(0,60)">
+          <rect x="0" y="0" width="560" height="80" rx="12" fill="#06050a"/>
+          <g fill="#3b2b5f">
+            <rect x="68" y="12" width="24" height="56" rx="8" />
+            <rect x="168" y="12" width="24" height="56" rx="8" />
+            <rect x="268" y="12" width="24" height="56" rx="8" />
+            <rect x="368" y="12" width="24" height="56" rx="8" />
+            <rect x="468" y="12" width="24" height="56" rx="8" />
+          </g>
+        </g>
+      </g>
+    </svg>`
+  },
+  {
+    q: "Qual modelo descreve a membrana como uma mistura fluida de lipídeos e proteínas em movimento lateral?",
+    choices: ["Modelo de mosaico fluido", "Modelo estático", "Teoria da membrana rígida", "Modelo lipossomal"],
+    correct: 0,
+    explanation: "Modelo do mosaico fluido (Singer e Nicolson): proteínas e lipídios movem-se lateralmente.",
+    svg: `<svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(20,20)">
+        <rect x="0" y="0" width="560" height="40" rx="12" fill="#0b0b0f"/>
+        <g fill="#a78bfa">
+          <rect x="40" y="8" width="60" height="24" rx="6"/>
+          <rect x="160" y="8" width="44" height="24" rx="6"/>
+          <rect x="260" y="8" width="80" height="24" rx="6"/>
+          <rect x="380" y="8" width="36" height="24" rx="6"/>
+          <rect x="460" y="8" width="54" height="24" rx="6"/>
+        </g>
+        <rect x="0" y="90" width="560" height="40" rx="12" fill="#0b0b0f"/>
+      </g>
+    </svg>`
+  },
+  {
+    q: "Qual é a função das proteínas integrais de membrana?",
+    choices: ["Catalisar reações no citoplasma", "Atuar como canais ou transportadores", "Armazenar glicogênio", "Sintetizar DNA"],
+    correct: 1,
+    explanation: "Proteínas integrais atravessam a bicamada e funcionam como canais ou transportadores.",
+    svg: `<svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="p1" x1="0" x2="1"><stop offset="0" stop-color="#c241f5"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+      <g transform="translate(20,20)">
+        <rect x="0" y="0" width="520" height="46" rx="12" fill="#0b0b0f"/>
+        <rect x="0" y="120" width="520" height="46" rx="12" fill="#0b0b0f"/>
+        <g transform="translate(240,20)">
+  <rect x="0" y="0" width="40" height="140" rx="10" fill="url(#p1)" />
+</g>
+
+          <path d="M0 0 C 12 44, 12 86, 0 130" stroke="url(#p1)" stroke-width="12" fill="none" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>`
+  },
+  {
+    q: "A passagem de água através de aquaporinas é um exemplo de:",
+    choices: ["Transporte ativo", "Difusão facilitada", "Exocitose", "Endocitose"],
+    correct: 1,
+    explanation: "Aquaporinas permitem passagem de água sem gasto de energia — difusão facilitada.",
+    svg: `<svg viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="w1" x1="0" x2="1"><stop offset="0" stop-color="#06b6d4"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+      <g transform="translate(10,10)">
+        <rect x="0" y="0" width="500" height="40" rx="10" fill="#0a0810"/>
+        <rect x="0" y="100" width="500" height="40" rx="10" fill="#0a0810"/>
+        <g transform="translate(240,10)">
+          <rect x="-16" y="36" width="32" height="60" rx="8" fill="url(#w1)"/>
+        </g>
+      </g>
+    </svg>`
+  },
+  {
+    q: "Qual processo requer energia (ATP) para transportar íons contra o gradiente de concentração?",
+    choices: ["Difusão simples", "Osmose", "Transporte ativo", "Difusão facilitada"],
+    correct: 2,
+    explanation: "Transporte ativo usa ATP para mover substâncias contra seu gradiente (ex.: bomba Na+/K+).",
+    svg: `<svg viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(10,20)">
+        <rect x="0" y="0" width="500" height="40" rx="10" fill="#0b0b0f"/>
+        <g fill="#f5d36a">
+          <rect x="220" y="10" width="60" height="20" rx="6"/>
+          <text x="250" y="25" font-size="10" fill="#0b0b0f" text-anchor="middle">ATP</text>
+        </g>
+      </g>
+    </svg>`
+  },
+  {
+    q: "O colesterol na membrana tem como papel principal:",
+    choices: ["Aumentar a fluidez e estabilidade", "Servir como canal iônico", "Formar glicocálix", "Transportar proteínas"],
+    correct: 0,
+    explanation: "Colesterol regula a fluidez e estabiliza a bicamada em diferentes temperaturas.",
+    svg: `<svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(10,10)">
+        <rect x="0" y="0" width="500" height="40" rx="10" fill="#0b0b0f"/>
+        <g fill="#f4e87a">
+          <circle cx="370" cy="20" r="10"/>
+        </g>
+      </g>
+    </svg>`
+  },
+  {
+    q: "Qual alternativa melhor define permeabilidade seletiva?",
+    choices: [
+      "Permite a passagem de todas as substâncias livremente",
+      "Permite apenas a passagem de água",
+      "Permite que algumas substâncias atravessem mais facilmente que outras",
+      "Impede totalmente a entrada de íons"
+    ],
+    correct: 2,
+    explanation: "Permeabilidade seletiva significa seleção: algumas moléculas passam mais facilmente que outras.",
+    svg: `<svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(10,10)">
+        <rect x="0" y="0" width="500" height="40" rx="10" fill="#0b0b0f"/>
+        <g fill="#9ad3ff">
+          <circle cx="120" cy="20" r="6"/>
+          <circle cx="160" cy="20" r="8"/>
+          <circle cx="200" cy="20" r="4"/>
+        </g>
+      </g>
+    </svg>`
+  },
+  {
+    q: "Glicoproteínas e glicolipídios no glicocálix contribuem para:",
+    choices: ["Produção de ATP","Reconhecimento celular e proteção","Respiração celular","Síntese proteica"],
+    correct: 1,
+    explanation: "Glicocálix (glicoproteínas/glicolipídios) participa do reconhecimento celular e proteção.",
+    svg: `<svg viewBox="0 0 520 180" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(10,10)">
+        <rect x="0" y="0" width="500" height="40" rx="10" fill="#0b0b0f"/>
+        <g fill="#f6c2ff">
+          <rect x="80" y="-6" width="20" height="20" rx="6"/>
+          <rect x="140" y="-6" width="20" height="20" rx="6"/>
+          <rect x="200" y="-6" width="20" height="20" rx="6"/>
+        </g>
+      </g>
+    </svg>`
+  },
+  {
+    q: "Qual alternativa é um exemplo de transporte passivo?",
+    choices: ["Bomba de Na+/K+","Endocitose","Difusão simples","Transporte secundário ativo"],
+    correct: 2,
+    explanation: "Difusão simples é transporte passivo: movimento a favor do gradiente sem gasto de energia.",
+    svg: `<svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(10,10)">
+        <rect x="0" y="0" width="500" height="40" rx="10" fill="#0b0b0f"/>
+        <g fill="#9ef7de">
+          <circle cx="120" cy="20" r="6"/>
+          <path d="M140 20 L200 20" stroke="#9ef7de" stroke-width="4" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>`
+  }
+];
+
+/* ====== STATE ====== */
+let state = {
+  questions: [],
+  current: 0,
+  score: 0.0,
+  timePer: 40,
+  timer: null,
+  timeLeft: 40,
+  answered: false,
+  audioEnabled: true
+};
+
+/* ====== ELEMENTS ====== */
+const el = {
+  intro: document.getElementById('intro'),
+  startBtn: document.getElementById('startBtn'),
+  qIndex: document.getElementById('qIndex'),
+  qTotal: document.getElementById('qTotal'),
+  questionText: document.getElementById('questionText'),
+  answers: document.getElementById('answers'),
+  nextBtn: document.getElementById('nextBtn'),
+  skipBtn: document.getElementById('skipBtn'),
+  timerText: document.getElementById('timerText'),
+  progressBar: document.getElementById('progressBar'),
+  score: document.getElementById('score'),
+  magicText: document.getElementById('magicText'),
+  sparkIcon: document.getElementById('sparkIcon'),
+  timePerInput: document.getElementById('timePer'),
+  imageContainer: document.getElementById('imageContainer'),
+  muteBtn: document.getElementById('muteBtn'),
+  leadList: document.getElementById('leadList'),
+  clearScores: document.getElementById('clearScores'),
+  magicBox: document.getElementById('magicBox')
+};
+
+/* ====== AUDIO: WebAudio magical chime and soft fail (embedded synthesis) ====== */
+let audioCtx = null;
+function ensureAudio(){
+  if(audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function playChime(){
+  if(!state.audioEnabled) return;
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  // three partials bell
+  const freqs = [880, 1320, 1760]; // harmonic shimmering
+  const master = audioCtx.createGain();
+  master.gain.value = 0.0001;
+  master.connect(audioCtx.destination);
+  master.gain.exponentialRampToValueAtTime(0.6, now + 0.02);
+  master.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+  freqs.forEach((f,i)=>{
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = i===0 ? 'sine' : 'triangle';
+    o.frequency.value = f + (i*6);
+    g.gain.value = 0.2/(i+1);
+    o.connect(g); g.connect(master);
+    // filter for smoothness
+    const filt = audioCtx.createBiquadFilter();
+    filt.type='lowpass'; filt.frequency.value = 5000 - i*600;
+    g.connect(filt); filt.connect(master);
+    o.start(now); o.stop(now + 2.2 + i*0.05);
+  });
+}
+function playSoftFail(){
+  if(!state.audioEnabled) return;
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  const o = audioCtx.createOscillator();
+  o.type = 'sawtooth';
+  o.frequency.value = 220;
+  const g = audioCtx.createGain();
+  g.gain.value = 0.0001;
+  o.connect(g); g.connect(audioCtx.destination);
+  g.gain.linearRampToValueAtTime(0.18, now + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+  o.start(now); o.stop(now + 1.05);
+}
+
+/* ====== HELPERS ====== */
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } }
+function pickQuestions(n){ const pool = QUESTIONS.slice(); shuffle(pool); return pool.slice(0,n); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ====== GAME FLOW ====== */
+function startRitual(){
+  el.intro.style.display = 'none';
+  startGame();
+}
+el.startBtn.addEventListener('click', ()=> {
+  // resume audio on user gesture
+  try{ ensureAudio(); if(audioCtx.state === 'suspended') audioCtx.resume(); }catch(e){}
+  startRitual();
+});
+
+function startGame(){
+  state.timePer = Math.max(10, Math.min(120, parseInt(el.timePerInput.value) || 40));
+  state.questions = pickQuestions(Math.min(QUESTIONS.length, 10));
+  state.current = 0;
+  state.score = 0.0;
+  state.answered = false;
+  el.qTotal.textContent = state.questions.length;
+  updateScoreUI();
+  renderQuestion();
+  updateLeaderboardUI();
+  setMagicNeutral();
+}
+
+function renderQuestion(){
+  const cur = state.questions[state.current];
+  el.qIndex.textContent = state.current + 1;
+  el.questionText.textContent = cur.q;
+  // image
+  if(cur.svg){
+    el.imageContainer.innerHTML = cur.svg;
+    el.imageContainer.style.display = 'flex';
+  } else {
+    el.imageContainer.style.display = 'none';
+    el.imageContainer.innerHTML = '';
+  }
+  // answers
+  el.answers.innerHTML = '';
+  cur.choices.forEach((c,idx)=>{
+    const b = document.createElement('button');
+    b.className = 'ans';
+    b.type = 'button';
+    b.innerHTML = `<strong>${String.fromCharCode(65+idx)}</strong><div style="flex:1"><div class="label">${escapeHtml(c)}</div></div>`;
+    b.onclick = ()=> handleAnswer(idx,b);
+    el.answers.appendChild(b);
+  });
+  el.nextBtn.disabled = true;
+  state.answered = false;
+  startTimer();
+  updateProgress();
+  setMagicNeutral();
+}
+
+function startTimer(){
+  clearInterval(state.timer);
+  state.timeLeft = state.timePer;
+  el.timerText.textContent = `${state.timeLeft}s`;
+  const total = state.timePer;
+  state.timer = setInterval(()=>{
+    state.timeLeft--;
+    if(state.timeLeft < 0){
+      clearInterval(state.timer);
+      handleTimeout();
+      return;
+    }
+    el.timerText.textContent = `${state.timeLeft}s`;
+    const base = Math.round((state.current / state.questions.length) * 100);
+    const usedPct = Math.round(((state.timePer - state.timeLeft) / state.timePer) * (100 / state.questions.length));
+    const blended = Math.min(100, base + usedPct);
+    el.progressBar.style.width = blended + '%';
+  },1000);
+}
+
+function handleAnswer(idx, btn){
+  if(state.answered) return;
+  state.answered = true;
+  clearInterval(state.timer);
+  const cur = state.questions[state.current];
+  const correct = cur.correct;
+  Array.from(el.answers.children).forEach((b,i)=>{
+    b.disabled = true;
+    if(i === correct) b.classList.add('correct');
+  });
+  if(idx === correct){
+    btn.classList.add('correct');
+    state.score += 1.0;
+    showMagic(true, cur.explanation);
+    playChime();
+  } else {
+    btn.classList.add('wrong');
+    showMagic(false, cur.explanation);
+    playSoftFail();
+  }
+  updateScoreUI();
+  el.nextBtn.disabled = false;
+}
+
+function handleTimeout(){
+  if(state.answered) return;
+  state.answered = true;
+  state.score = Math.max(0, +(state.score - 0.5).toFixed(2));
+  updateScoreUI();
+  const cur = state.questions[state.current];
+  Array.from(el.answers.children).forEach((b,i)=>{
+    b.disabled = true;
+    if(i === cur.correct) b.classList.add('correct');
+  });
+  showMagic(false, `Tempo esgotado. ${cur.explanation}`);
+  playSoftFail();
+  el.nextBtn.disabled = false;
+}
+
+function updateProgress(){
+  const pct = Math.round((state.current / state.questions.length) * 100);
+  el.progressBar.style.width = pct + '%';
+}
+function updateScoreUI(){ el.score.textContent = state.score.toFixed(1); }
+
+function showMagic(correct, explanation){
+  if(correct){
+    el.sparkIcon.textContent = "🔮";
+    el.magicText.textContent = `A energia flui — você atravessou o portal. ${explanation}`;
+    flashGlow('#8b5cf6');
+  } else {
+    el.sparkIcon.textContent = "⚡";
+    el.magicText.textContent = `A barreira te bloqueou. ${explanation}`;
+    flashGlow('#c241f5');
+  }
+}
+function setMagicNeutral(){
+  el.sparkIcon.textContent = "";
+  el.magicText.textContent = "Sinta a membrana — escolha com atenção.";
+  el.magicBox.style.boxShadow = "0 12px 36px rgba(6,11,20,0.6)";
+}
+function flashGlow(color){
+  el.magicBox.style.boxShadow = `0 18px 50px ${color}33, inset 0 0 24px ${color}22`;
+  setTimeout(()=>{ el.magicBox.style.boxShadow = "0 12px 36px rgba(6,11,20,0.6)"; }, 900);
+}
+
+/* next & skip */
+el.nextBtn.addEventListener('click', ()=>{
+  state.current++;
+  if(state.current >= state.questions.length){
+    finishGame();
+  } else {
+    renderQuestion();
+  }
+});
+el.skipBtn.addEventListener('click', ()=>{
+  if(state.answered) return;
+  clearInterval(state.timer);
+  state.answered = true;
+  state.score = Math.max(0, +(state.score - 0.5).toFixed(2));
+  updateScoreUI();
+  const cur = state.questions[state.current];
+  Array.from(el.answers.children).forEach((b,i)=>{
+    b.disabled = true;
+    if(i===cur.correct) b.classList.add('correct');
+  });
+  showMagic(false, `Você pulou — ${cur.explanation}`);
+  playSoftFail();
+  el.nextBtn.disabled = false;
+});
+
+/* finish + leaderboard */
+function finishGame(){
+  clearInterval(state.timer);
+  const name = prompt(`Ritual concluído!\nPontuação: ${state.score.toFixed(1)}\nDigite seu nome para salvar no placar:`, "Aluno");
+  if(name !== null){
+    saveScore({name: name.trim() || 'Anônimo', score: +(state.score.toFixed(1)), date: new Date().toISOString()});
+  }
+  // restart flow
+  state.current = 0;
+  state.score = 0.0;
+  updateScoreUI();
+  startGame();
+}
+
+/* leaderboard localStorage */
+function saveScore(entry){
+  const key = 'oraculo_membrana_board';
+  let arr = JSON.parse(localStorage.getItem(key) || '[]');
+  arr.push(entry);
+  arr = arr.sort((a,b)=>b.score - a.score).slice(0,10);
+  localStorage.setItem(key, JSON.stringify(arr));
+  updateLeaderboardUI();
+}
+function updateLeaderboardUI(){
+  const key = 'oraculo_membrana_board';
+  let arr = JSON.parse(localStorage.getItem(key) || '[]');
+  el.leadList.innerHTML = '';
+  if(!arr.length){
+    el.leadList.innerHTML = '<li class="small">Nenhum resultado — jogue para aparecer.</li>';
+    return;
+  }
+  arr.forEach((r,idx)=>{
+    const d = new Date(r.date);
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>#${idx+1} ${escapeHtml(r.name)}</strong> — ${r.score} pts <span style="color:var(--muted);font-size:12px">(${d.toLocaleString()})</span>`;
+    el.leadList.appendChild(li);
+  });
+}
+el.clearScores.addEventListener('click', ()=>{
+  localStorage.removeItem('oraculo_membrana_board');
+  updateLeaderboardUI();
+});
+
+/* mute toggle */
+el.muteBtn.addEventListener('click', ()=>{
+  state.audioEnabled = !state.audioEnabled;
+  el.muteBtn.textContent = state.audioEnabled ? '🔊 Som' : '🔇 Mudo';
+  if(state.audioEnabled){
+    try{ ensureAudio(); if(audioCtx.state === 'suspended') audioCtx.resume(); }catch(e){}
+  }
+});
+
+/* init on DOM ready */
+document.addEventListener('DOMContentLoaded', ()=>{
+  el.timePerInput.value = state.timePer = 40;
+  document.getElementById('qTotal').textContent = Math.min(QUESTIONS.length, 10);
+  el.timePerInput.addEventListener('change', ()=>{
+    const v = Math.max(10, Math.min(120, parseInt(el.timePerInput.value) || 40));
+    el.timePerInput.value = v;
+    state.timePer = v;
+  });
+  // if you want immediate start for testing uncomment:
+  // startRitual();
+});
+</script>
+</body>
+</html>
